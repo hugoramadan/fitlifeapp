@@ -4,22 +4,22 @@
 Sistema web para geração e acompanhamento da rotina diária de hábitos saudáveis.
 
 ## 👥 Integrantes
-- Nome 1
-- Nome 2
-- Nome 3
+- Giovanni
+- Hugo Ribeiro Ramadan
+- André Hilario
+- Rafaela Correa
 
 ## 🛠 Tecnologias
 - PHP
 - MySQL
 - XAMPP
-- Bootstrap
 
-## ▶️ Como executar
+## ▶️ Como preparar o ambiente de desenvolvimento
 
 1. Instalar XAMPP
-2. Colocar a pasta fitlife dentro de htdocs
-3. Importar banco.sql no phpMyAdmin
-4. Iniciar Apache e MySQL
+2. Colocar todos os arquivos na dentro de htdocs/fitlife
+3. Iniciar Apache e MySQL no XAMPP
+4. Importar banco.sql no phpMyAdmin e executar para criar tabelas.
 5. Acessar:
    http://localhost/fitlife
 
