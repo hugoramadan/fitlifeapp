@@ -9,9 +9,16 @@ Sistema web para geração e acompanhamento da rotina diária de hábitos saudá
 - André Hilario
 - Rafaela Correa
 
-## 🛠 Tecnologias
+## 🛠 Tecnologias (stack)
+### Front-end
+- HTML
+- CSS
+  
+### Back-end
 - PHP
 - MySQL
+
+### Ambiente de desenvolvimento
 - XAMPP
 
 ## ▶️ Como preparar o ambiente de desenvolvimento
