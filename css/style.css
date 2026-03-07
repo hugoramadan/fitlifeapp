@@ -1,11 +1,178 @@
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #e9ecef 25%, #f8f9fa 100%);
+    margin: 0;
+    padding: 0;
+    color: #343a40;
+}
+
+h1,h2,h3,h4,h5,h6 {
+    color: #212529;
+}
+
+.container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
 
 .card {
     border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.card-body {
+    padding: 1.25rem;
 }
 
 .list-group-item {
     border-radius: 8px;
+    margin-bottom: 0.5rem;
+    transition: background-color 0.2s;
 }
+
+.list-group-item:hover {
+    background-color: #f1f3f5;
+}
+
+.list-group-item .form-check-label {
+    margin-left: 0.5rem;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+.btn-outline-primary {
+    color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0d6efd;
+    color: #fff;
+}
+
+.btn-outline-secondary {
+    color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+/* Formulário de adição */
+.input-group .form-control {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+/* botões com ícones */
+.btn i.bi {
+    margin-right: 0.3rem;
+}
+
+.input-group .btn {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+/* Cabeçalho do dashboard */
+.d-flex.justify-content-between.align-items-center.mb-3 h3 {
+    font-weight: 600;
+}
+
+/* Evolução gráfico e tabela */
+#chart {
+    width: 100% !important;
+    max-height: 200px;
+    margin-top: 1rem;
+}
+
+/* Ajustes gerais */
+.table-responsive table {
+    margin-bottom: 0;
+}
+
+/* cabeçalho de tabela */
+.table thead th {
+    background-color: #f1f3f5;
+}
+
+.alert {
+    border-radius: 8px;
+}
+
+a.text-danger {
+    text-decoration: none;
+}
+
+a.text-danger:hover {
+    text-decoration: underline;
+}
+
+/* navbar enhancements */
+.navbar {
+    padding: 0.5rem 1rem;
+}
+.navbar-brand {
+    font-size: 1.25rem;
+}
+
+/* card headers and sections */
+.card .card-body {
+    position: relative;
+}
+.card-header {
+    background-color: #f1f3f5;
+    font-weight: 600;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* progress text small badge in dashboard */
+.badge.text-bg-success {
+    background-color: #198754;
+}
+
+/* barra de progresso personalizada */
+.progress {
+    height: 1rem;
+    background-color: #e9ecef;
+    border-radius: 0.5rem;
+}
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+/* tarefas concluídas */
+.list-group-item input.form-check-input:checked + span {
+    text-decoration: line-through;
+    color: #6c757d;
+}
+
+/* cabeçalho maior e com borda inferior */
+header.d-flex {
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 0.5rem;
+}
+
+/* checkbox spacing */
+.form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
