@@ -16,28 +16,42 @@ $mapDias = [
     'Sun' => 'Dom'
 ];
 
+$sql = "
+SELECT 
+    dp.data,
+    COUNT(pi.id) as total,
+    SUM(pi.concluido) as done
+FROM daily_plans dp
+LEFT JOIN plan_items pi ON pi.daily_plan_id = dp.id
+WHERE dp.user_id = $user_id
+AND dp.data >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+GROUP BY dp.data
+";
+
+$res = $conn->query($sql);
+
+$dados = [];
+while ($row = $res->fetch_assoc()) {
+    $dados[$row['data']] = [
+        'total' => (int)$row['total'],
+        'done' => (int)$row['done']
+    ];
+}
+
 for ($i = 6; $i >= 0; $i--) {
     $d = date('Y-m-d', strtotime("-$i days"));
-    $planRes = $conn->query("SELECT id FROM daily_plans WHERE user_id=$user_id AND data='$d' LIMIT 1");
-    $pct = 0;
 
-    if ($planRes && $planRes->num_rows > 0) {
-        $plan = $planRes->fetch_assoc();
-        $plan_id = (int)$plan['id'];
-        $itemsRes = $conn->query("SELECT concluido FROM plan_items WHERE daily_plan_id=$plan_id");
-        if ($itemsRes) {
-            $total = $itemsRes->num_rows;
-            $done = 0;
-            while ($row = $itemsRes->fetch_assoc()) {
-                if ((int)$row['concluido'] === 1) $done++;
-            }
-            if ($total > 0) {
-                $pct = (int)round(($done / $total) * 100);
-            }
-        }
-    }
+    $total = $dados[$d]['total'] ?? 0;
+    $done = $dados[$d]['done'] ?? 0;
+
+    $pct = $total > 0 ? (int)round(($done / $total) * 100) : 0;
+
     $diaNome = $mapDias[date('D', strtotime($d))] ?? date('D', strtotime($d));
-    $semana[] = ['dia' => $diaNome, 'pct' => $pct];
+
+    $semana[] = [
+        'dia' => $diaNome,
+        'pct' => $pct
+    ];
 }
 
 ?>
