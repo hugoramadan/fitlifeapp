@@ -70,7 +70,6 @@ $dataBR = date("d/m/Y");
   <link rel="stylesheet" href="css/style.css">
   <style>
     body {
-      background-color: #f8f9fa;
       color: #343a40;
     }
 
@@ -105,7 +104,7 @@ $dataBR = date("d/m/Y");
   </style>
 </head>
 
-<body class="bg-light">
+<body>
   <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4">
     <div class="container-fluid">
       <a class="navbar-brand" href="dashboard.php">FitLife</a>
