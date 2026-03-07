@@ -175,7 +175,7 @@ $dataBR = date("d/m/Y");
 
                 <div class="d-flex gap-2 align-items-center">
                   <?php if ($concluido): ?>
-                    <span class="badge text-bg-secondary">Concluído</span>
+                    <span class="badge text-bg-success">Concluído</span>
                   <?php else: ?>
                     <span class="badge text-bg-warning">Pendente</span>
                   <?php endif; ?>
