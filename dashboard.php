@@ -1,141 +1,206 @@
 <?php
-// dashboard.php
-include("includes/conexao.php");
 include("includes/auth.php");
+include("includes/conexao.php");
 
-$user_id = (int)$_SESSION['user_id'];
+$user_id = (int)($_SESSION["user_id"] ?? 0);
+$nome = $_SESSION["nome"] ?? "Usuário";
+
 $data = date("Y-m-d");
 
-// busca o usuário (só para exibir nome)
-$userRes = $conn->query("SELECT nome FROM users WHERE id = $user_id LIMIT 1");
-$user = $userRes ? $userRes->fetch_assoc() : null;
-$nome = $user ? $user['nome'] : "Usuário";
-
-// busca (ou não) a rotina de hoje
-$planRes = $conn->query("SELECT id FROM daily_plans WHERE user_id = $user_id AND data = '$data' LIMIT 1");
-$plan = $planRes ? $planRes->fetch_assoc() : null;
-
-$items = [];
-$progressText = "0%";
-$hasPlan = false;
-
-if ($plan && isset($plan['id'])) {
-    $hasPlan = true;
-    $plan_id = (int)$plan['id'];
-
-    // itens da rotina
-    $itemsRes = $conn->query("SELECT id, titulo, concluido FROM plan_items WHERE daily_plan_id = $plan_id ORDER BY id ASC");
-    if ($itemsRes) {
-        while ($row = $itemsRes->fetch_assoc()) {
-            $items[] = $row;
-        }
-    }
-
-    // calcula progresso
-    $total = count($items);
-    $done = 0;
-    foreach ($items as $it) {
-        if ((int)$it['concluido'] === 1) $done++;
-    }
-    $percent = ($total > 0) ? (int)round(($done / $total) * 100) : 0;
-    $progressText = $percent . "%";
+if (isset($_GET['delete_item']) && ctype_digit($_GET['delete_item'])) {
+  $delId = (int)$_GET['delete_item'];
+  $conn->query("DELETE pi FROM plan_items pi
+        JOIN daily_plans dp ON pi.daily_plan_id = dp.id
+        WHERE pi.id=$delId AND dp.user_id=$user_id AND dp.data='$data'");
+  header('Location: dashboard.php');
+  exit;
 }
 
+if (
+  $_SERVER['REQUEST_METHOD'] === 'POST' &&
+  !empty($_POST['new_item'])
+) {
+  $titulo = $conn->real_escape_string(trim($_POST['new_item']));
+  if ($titulo !== '') {
+    $planRes2 = $conn->query("SELECT id FROM daily_plans WHERE user_id=$user_id AND data='$data' LIMIT 1");
+    if ($planRes2 && $planRes2->num_rows > 0) {
+      $plan2 = $planRes2->fetch_assoc();
+      $plan2_id = (int)$plan2['id'];
+      $conn->query("INSERT INTO plan_items (daily_plan_id, titulo) VALUES ($plan2_id, '$titulo')");
+    }
+  }
+  header('Location: dashboard.php');
+  exit;
+}
+
+$plan_id = 0;
+$planRes = $conn->query("SELECT id FROM daily_plans WHERE user_id = $user_id AND data = '$data' LIMIT 1");
+if ($planRes && $planRes->num_rows === 1) {
+  $plan = $planRes->fetch_assoc();
+  $plan_id = (int)$plan["id"];
+}
+
+$items = [];
+if ($plan_id > 0) {
+  $itRes = $conn->query("SELECT id, titulo, concluido FROM plan_items WHERE daily_plan_id = $plan_id ORDER BY id ASC");
+  if ($itRes) {
+    while ($row = $itRes->fetch_assoc()) $items[] = $row;
+  }
+}
+
+$total = count($items);
+$done = 0;
+foreach ($items as $it) {
+  if ((int)$it["concluido"] === 1) $done++;
+}
+$percent = ($total > 0) ? (int)round(($done / $total) * 100) : 0;
+
+$dataBR = date("d/m/Y");
 ?>
+
 <!doctype html>
 <html lang="pt-br">
+
 <head>
-  <meta charset="utf-8">
-  <title>FitLife - Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Bootstrap (CDN) -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FitLife - Rotina do Dia</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Seu CSS opcional -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      color: #343a40;
+    }
+
+    .card {
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+    }
+
+    .list-group-item {
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+    }
+
+    .btn-primary {
+      background-color: #0d6efd;
+      border-color: #0d6efd;
+    }
+
+    .navbar {
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      color: #0d6efd;
+    }
+
+    .card-header {
+      background-color: #f1f3f5;
+      font-weight: 600;
+    }
+  </style>
 </head>
+
 <body class="bg-light">
-
-<div class="container py-4" style="max-width: 820px;">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <h3 class="mb-0">Bem-vinda(o), <?php echo htmlspecialchars($nome); ?>!</h3>
-      <small class="text-muted">Rotina de hoje — <?php echo date("d/m/Y"); ?></small>
+  <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="dashboard.php">FitLife</a>
+      <div class="d-flex">
+        <span class="navbar-text me-3 text-muted small">Olá, <?php echo htmlspecialchars($nome); ?></span>
+        <a class="btn btn-outline-secondary btn-sm" href="logout.php"><i class="bi bi-box-arrow-right"></i> Sair</a>
+      </div>
     </div>
-    <div class="d-flex gap-2">
-      <a class="btn btn-outline-secondary" href="logout.php">Sair</a>
-    </div>
-  </div>
+  </nav>
+  <div class="container py-4">
 
-  <?php if (!$hasPlan): ?>
-    <div class="alert alert-info">
-      Você ainda não tem uma rotina gerada para hoje.
-    </div>
-    <a class="btn btn-primary" href="gerar_rotina.php">Gerar rotina do dia</a>
+    <header class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h1 class="h4 mb-0">Rotina do Dia</h1>
+        <div class="text-muted small">Hoje: <?php echo $dataBR; ?></div>
+      </div>
+    </header>
 
-  <?php else: ?>
-    <div class="card shadow-sm mb-3">
+    <section class="card shadow-sm mb-3">
       <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center">
-          <h5 class="card-title mb-0">Sua rotina de hoje</h5>
-          <span class="badge text-bg-success">Progresso: <?php echo $progressText; ?></span>
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+          <div>
+            <h2 class="h6 mb-1">Sua rotina</h2>
+            <div class="text-muted small">
+              <?php if ($plan_id === 0): ?>
+                Você ainda não gerou a rotina de hoje.
+              <?php else: ?>
+                Marque os itens conforme concluir.
+              <?php endif; ?>
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <a class="btn btn-primary btn-sm" href="gerar_rotina.php"><i class="bi bi-plus-circle"></i>Gerar rotina</a>
+            <a class="btn btn-outline-secondary btn-sm" href="evolucao.php"><i class="bi bi-bar-chart"></i>Evolução</a>
+          </div>
         </div>
 
         <hr>
 
-        <?php if (count($items) === 0): ?>
-          <p class="text-muted mb-0">Nenhum item encontrado.</p>
-        <?php else: ?>
-          <div class="list-group">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted small">Progresso do dia</span>
+          <span class="badge text-bg-success"><?php echo $percent; ?>%</span>
+        </div>
+        <div class="progress mb-3">
+          <div class="progress-bar bg-success" role="progressbar" style="width: <?php echo $percent; ?>%;" aria-valuenow="<?php echo $percent; ?>" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+
+        <div class="list-group mb-3">
+          <?php if ($plan_id === 0): ?>
+            <div class="text-muted small">Nenhuma rotina gerada ainda.</div>
+          <?php else: ?>
             <?php foreach ($items as $it): ?>
               <?php
-                $item_id = (int)$it['id'];
-                $titulo = $it['titulo'];
-                $concluido = ((int)$it['concluido'] === 1);
+              $item_id = (int)$it['id'];
+              $titulo = $it['titulo'];
+              $concluido = ((int)$it['concluido'] === 1);
               ?>
               <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div class="form-check">
-                  <!-- Quando clicar, envia para marcar_item.php -->
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="item_<?php echo $item_id; ?>"
+                <div class="form-check d-flex align-items-center gap-2">
+                  <input class="form-check-input" type="checkbox"
                     <?php echo $concluido ? "checked" : ""; ?>
-                    onchange="window.location.href='marcar_item.php?id=<?php echo $item_id; ?>&v=<?php echo $concluido ? 0 : 1; ?>';"
-                  >
-                  <label class="form-check-label" for="item_<?php echo $item_id; ?>">
+                    onchange="window.location.href='marcar_item.php?id=<?php echo $item_id; ?>&v=<?php echo $concluido ? 0 : 1; ?>';">
+                  <label class="form-check-label mb-0">
                     <?php echo htmlspecialchars($titulo); ?>
                   </label>
                 </div>
 
-                <?php if ($concluido): ?>
-                  <span class="badge text-bg-secondary">Concluído</span>
-                <?php else: ?>
-                  <span class="badge text-bg-warning">Pendente</span>
-                <?php endif; ?>
+                <div class="d-flex gap-2 align-items-center">
+                  <?php if ($concluido): ?>
+                    <span class="badge text-bg-secondary">Concluído</span>
+                  <?php else: ?>
+                    <span class="badge text-bg-warning">Pendente</span>
+                  <?php endif; ?>
+
+                  <a href="dashboard.php?delete_item=<?php echo $item_id; ?>"
+                    class="text-danger small"
+                    onclick="return confirm('Tem certeza que deseja excluir esta tarefa?');">
+                    <i class="bi bi-trash"></i>
+                  </a>
+                </div>
               </div>
             <?php endforeach; ?>
-          </div>
+          <?php endif; ?>
+        </div>
+
+        <?php if ($plan_id !== 0): ?>
+          <form method="post" class="input-group mb-3">
+            <input type="text" name="new_item" class="form-control" placeholder="Adicionar nova tarefa" required>
+            <button class="btn btn-primary" type="submit"><i class="bi bi-plus-circle"></i> Adicionar</button>
+          </form>
         <?php endif; ?>
 
-        <div class="d-flex justify-content-between mt-3">
-          <a class="btn btn-outline-primary" href="gerar_rotina.php">Regerar (se não existir)</a>
-          <a class="btn btn-outline-secondary" href="dashboard.php">Atualizar</a>
-        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h6 class="mb-2">Observação (POC)</h6>
-        <p class="text-muted mb-0">
-          Esta é a prova de conceito: gerar a rotina diária, marcar itens como concluídos e calcular progresso.
-        </p>
-      </div>
-    </div>
-  <?php endif; ?>
-</div>
-
+  </div>
 </body>
 </html>
