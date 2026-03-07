@@ -3,7 +3,7 @@ include("includes/auth.php");
 include("includes/conexao.php");
 
 $user_id = (int)($_SESSION["user_id"] ?? 0);
-$nome = $_SESSION["nome"] ?? "Usuário";
+$nome = $_SESSION["nome"] ?? "Júlia";
 
 $data = date("Y-m-d");
 
