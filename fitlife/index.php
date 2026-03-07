@@ -8,11 +8,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = $_POST["email"] ?? "";
     $senha = $_POST["senha"] ?? "";
 
-    $email = $conn->real_escape_string($email);
-    $senha = $conn->real_escape_string($senha);
+    $stmt = $conn->prepare("SELECT id, nome FROM users WHERE email = ? AND senha = ? LIMIT 1");
+    $stmt->bind_param("ss", $email, $senha);
+    $stmt->execute();
 
-    $sql = "SELECT id, nome FROM users WHERE email='$email' AND senha='$senha' LIMIT 1";
-    $res = $conn->query($sql);
+    $res = $stmt->get_result();
 
     if ($res && $res->num_rows === 1) {
         $u = $res->fetch_assoc();
@@ -24,6 +24,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
         $erro = "Login inválido.";
     }
+
+    $stmt->close();
 }
 ?>
 

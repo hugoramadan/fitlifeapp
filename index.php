@@ -4,21 +4,28 @@ include("includes/conexao.php");
 
 $erro = "";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email'];
-    $senha = $_POST['senha'];
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $email = $_POST["email"] ?? "";
+    $senha = $_POST["senha"] ?? "";
 
-    $sql = "SELECT * FROM users WHERE email='$email' AND senha='$senha' LIMIT 1";
-    $result = $conn->query($sql);
+    $stmt = $conn->prepare("SELECT id, nome FROM users WHERE email = ? AND senha = ? LIMIT 1");
+    $stmt->bind_param("ss", $email, $senha);
+    $stmt->execute();
 
-    if ($result->num_rows == 1) {
-        $user = $result->fetch_assoc();
-        $_SESSION['user_id'] = $user['id'];
+    $res = $stmt->get_result();
+
+    if ($res && $res->num_rows === 1) {
+        $u = $res->fetch_assoc();
+        $_SESSION["logado"] = true;
+        $_SESSION["user_id"] = (int)$u["id"];
+        $_SESSION["nome"] = $u["nome"];
         header("Location: dashboard.php");
         exit();
     } else {
         $erro = "Login inválido.";
     }
+
+    $stmt->close();
 }
 ?>
 <!doctype html>
