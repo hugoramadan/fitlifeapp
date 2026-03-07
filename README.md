@@ -4,7 +4,7 @@
 Sistema web para geração e acompanhamento da rotina diária de hábitos saudáveis.
 
 ## 👥 Integrantes
-- Giovanni
+- Giovanni Madalozzo
 - Hugo Ribeiro Ramadan
 - André Hilario
 - Rafaela Correa
