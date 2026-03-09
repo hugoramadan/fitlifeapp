@@ -4,10 +4,10 @@
 Sistema web para geração e acompanhamento da rotina diária de hábitos saudáveis.
 
 ## 👥 Integrantes
-- Giovanni Madalozzo
+- Giovanni Madalozzo Oliveira
 - Hugo Ribeiro Ramadan
-- André Hilario
-- Rafaela Correa
+- André Ikejiri Hilario
+- Rafaela Correa Pastor
 
 ## 🛠 Tecnologias (stack)
 ### Front-end
@@ -24,7 +24,7 @@ Sistema web para geração e acompanhamento da rotina diária de hábitos saudá
 ## ▶️ Como preparar o ambiente de desenvolvimento
 
 1. Instalar XAMPP
-2. Colocar todos os arquivos na dentro de htdocs/fitlife
+2. Colocar todos os arquivos da pasta fitlife na dentro de htdocs/fitlife
 3. Iniciar Apache e MySQL no XAMPP
 4. Importar banco.sql no phpMyAdmin e executar para criar tabelas.
 5. Acessar:
